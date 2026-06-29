@@ -1,0 +1,87 @@
+.dashboard-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.token-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-evenly;
+}
+
+.token-card {
+  flex: 1 1 45%;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  min-width: 320px;
+
+  h3 {
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+  }
+}
+
+.form-section {
+  margin-bottom: 15px;
+}
+
+.result-section {
+  margin-top: 10px;
+}
+
+textarea {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  font-family: monospace;
+  resize: vertical;
+}
+
+.redButton, .blueButton {
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.redButton {
+  background-color: #c62828;
+
+  &:hover {
+    background-color: #a61d24;
+  }
+}
+
+.blueButton {
+  background-color: #1976d2;
+
+  &:hover {
+    background-color: #115293;
+  }
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 20px 0;
+}
+
+@media (max-width: 768px) {
+  .token-panel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

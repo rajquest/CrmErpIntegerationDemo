@@ -1,0 +1,104 @@
+.layout {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar main";
+  grid-template-columns: 240px 1fr;
+  grid-template-rows: 60px 1fr;
+  height: 100vh;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  color: #333;
+}
+
+.header {
+  grid-area: header;
+  background-color: #CD5C5C;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.company-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.header-right a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  background-color: #f8f9fb;
+  border-right: 1px solid #ddd;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.sidebar .menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar .menu li {
+  margin: 0.7rem 0;
+}
+
+.sidebar .menu a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+.sidebar .menu a.active {
+  color: #1976d2;
+}
+
+.saved-reports {
+  margin-top: 2rem;
+}
+
+.saved-reports h4 {
+  font-size: 0.9rem;
+  color: #888;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.saved-reports ul {
+  list-style: none;
+  padding: 0;
+}
+
+.saved-reports li {
+  margin: 0.4rem 0;
+}
+
+.saved-reports a {
+  color: #555;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.saved-reports a.active {
+  color: #1976d2;
+  font-weight: 600;
+}
+
+.main-content {
+  grid-area: main;
+  padding: 1.5rem;
+  background-color: white;
+  overflow-y: auto;
+}

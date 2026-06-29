@@ -1,0 +1,46 @@
+<div class="dashboard-container">
+  <h2 class="title">OAuth Token Generator</h2>
+
+  <div class="token-panel">
+    <!-- Left Panel: Infor Tokens -->
+    <div class="token-card">
+      <h3>Infor Tokens</h3>
+
+      <div class="form-section">
+        <button (click)="getInforAppToken()" class="redButton">
+          Get Infor App OAuth Token
+        </button>
+        <div class="result-section" *ngIf="accessToken || errorMessage">
+          <label>Infor App Access Token:</label>
+          <textarea rows="6" readonly [value]="accessToken || errorMessage"></textarea>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <div class="form-section">
+        <button (click)="getInforApiToken()" class="redButton">
+          Get Infor API Token
+        </button>
+        <div class="result-section" *ngIf="apiAccessToken || appErrorMessage">
+          <label>API Access Token:</label>
+          <textarea rows="6" readonly [value]="apiAccessToken || appErrorMessage"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel: Salesforce Token -->
+    <div class="token-card">
+      <h3>Salesforce</h3>
+      <div class="form-section">
+        <button (click)="getSalesforceToken()" class="blueButton">
+          Get Salesforce API Token
+        </button>
+        <div class="result-section" *ngIf="sfAccessToken || sfErrorMessage">
+          <label>Salesforce Access Token:</label>
+          <textarea rows="6" readonly [value]="sfAccessToken || sfErrorMessage"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

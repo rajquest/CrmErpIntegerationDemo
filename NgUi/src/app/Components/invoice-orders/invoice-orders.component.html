@@ -1,0 +1,192 @@
+<div class="items-container">
+  <h2>Customer Invoices</h2>
+
+  <div class="row">
+    <div class="col-3">
+      <mat-form-field>
+        <mat-label>Enter a date range</mat-label>
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate placeholder="Start date" [(ngModel)]="startDate">
+          <input matEndDate placeholder="End date" [(ngModel)]="endDate">
+        </mat-date-range-input>
+        <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+    </div>
+
+    <div class="col-2">
+      <button mat-raised-button (click)="onSearch()" class="btn btn-secondary">
+        Search
+      </button>
+    </div>
+    <div class="col-2">
+      <button mat-raised-button class="btn btn-success" (click)="exportDataset()">
+        <mat-icon>table_view</mat-icon> Export
+      </button>
+    </div>
+  </div>
+
+  <div class="spinner-overlay" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 full-width">
+
+    <ng-container matColumnDef="toggleColumn">
+      <th mat-header-cell *matHeaderCellDef [attr.colspan]="displayedColumns.length">
+        <div class="toggle-container">
+          <div class="left-section">
+            <mat-slide-toggle [(ngModel)]="useMinified" (change)="updateDisplayedColumns()">
+              {{ toggleText }}
+            </mat-slide-toggle>
+          </div>
+          <div class="right-section">
+            Total Records: {{ dataSource.data.length || 0 }}
+          </div>
+        </div>
+      </th>
+    </ng-container>
+
+    <ng-container matColumnDef="derInvNum">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Invoice #</th>
+      <td mat-cell *matCellDef="let row">{{ row.derInvNum }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="derCoNum">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Order #</th>
+      <td mat-cell *matCellDef="let row">{{ row.derCoNum }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="invhdrInvDate">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Invoice Date</th>
+      <td mat-cell *matCellDef="let row">{{ utils.parseInforDate(row.invhdrInvDate) | date:'MM/dd/yyyy' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="invhdrPrice">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Total Price</th>
+      <td mat-cell *matCellDef="let row">{{ row.invhdrPrice | currency }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="item">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Item</th>
+      <td mat-cell *matCellDef="let row">{{ row.item }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="derDescription">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Description</th>
+      <td mat-cell *matCellDef="let row">{{ row.derDescription }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="coLine">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Line #</th>
+      <td mat-cell *matCellDef="let row">{{ row.coLine }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="derCustPo">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">PO #</th>
+      <td mat-cell *matCellDef="let row">{{ row.derCustPo }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="qtyInvoiced">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Qty</th>
+      <td mat-cell *matCellDef="let row">{{ utils.toInteger(row.qtyInvoiced) }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="invhdrMiscCharges">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Misc Charges</th>
+      <td mat-cell *matCellDef="let row">{{ row.invhdrMiscCharges | currency }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="invhdrPrepaidAmt">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Prepaid</th>
+      <td mat-cell *matCellDef="let row">{{ row.invhdrPrepaidAmt | currency }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="invhdrFreight">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Freight</th>
+      <td mat-cell *matCellDef="let row">{{ row.invhdrFreight | currency }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="coNum">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Original Order #</th>
+      <td mat-cell *matCellDef="let row">{{ row.coNum }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="derCustNum">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Customer #</th>
+      <td mat-cell *matCellDef="let row">{{ row.derCustNum }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="coOrderDate">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Order Date</th>
+      <td mat-cell *matCellDef="let row">{{ utils.parseInforDate(row.coOrderDate) | date:'MM/dd/yyyy' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="shipDate">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Ship Date</th>
+      <td mat-cell *matCellDef="let row">{{ utils.parseInforDate(row.shipDate) | date:'MM/dd/yyyy' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="shipToState">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">State</th>
+      <td mat-cell *matCellDef="let row">{{ row.shipToState }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="shipToTaxCode">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Tax Code</th>
+      <td mat-cell *matCellDef="let row">{{ row.shipToTaxCode }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="stat">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Status</th>
+      <td mat-cell *matCellDef="let row">{{ row.stat }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="customerName">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Customer Name</th>
+      <td mat-cell *matCellDef="let row">{{ row.customerName }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="notes">
+      <th mat-header-cell *matHeaderCellDef class="tb-header-cell">Notes</th>
+      <td mat-cell *matCellDef="let row">{{ row.notes }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="totalSalesTaxRate">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Total Tax Rate</th>
+      <td mat-cell *matCellDef="let row">{{ row.totalSalesTaxRate ? (row.totalSalesTaxRate + ' %') : '' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="taxRateList">
+      <th mat-header-cell *matHeaderCellDef class="tb-header-cell">Tax List</th>
+      <td mat-cell *matCellDef="let row">
+        <div class="tax-table" *ngIf="row.taxRateList?.length">
+          <div class="tax-row" *ngFor="let tax of row.taxRateList">
+            <div class="tax-code">{{ tax.taxCode }}</div>
+            <div class="tax-rate">{{ tax.taxRate ? (tax.taxRate | number:'1.0-2') + '%' : '' }}</div>
+          </div>
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="salesTax">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Sales Tax</th>
+      <td mat-cell *matCellDef="let row">{{ row.salesTax | currency }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="taxableAmount">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Taxable Amount</th>
+      <td mat-cell *matCellDef="let row">{{ row.taxableAmount | currency }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="exemptAmount">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Exempt Amount</th>
+      <td mat-cell *matCellDef="let row">{{ row.exemptAmount | currency }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="['toggleColumn']"></tr>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</div>

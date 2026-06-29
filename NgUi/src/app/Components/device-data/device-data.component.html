@@ -1,0 +1,75 @@
+<div class="row">
+  <h2>Salesforce Product Records</h2>
+</div>
+<div class="row">
+  <div class="col-2">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Rows per page</mat-label>
+      <mat-select [(value)]="rowCount" (selectionChange)="onPageSizeChange($event.value)">
+        <mat-option *ngFor="let size of pageSizeOptions" [value]="size">
+          {{ size }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div class="col-3">
+    <mat-form-field appearance="outline" class="filter-box">
+      <mat-label>Filter Records</mat-label>
+      <input matInput (keyup)="applyFilter($event)" placeholder="Search…" />
+    </mat-form-field>
+  </div>
+</div>
+
+<div class="row">
+  <table mat-table [dataSource]="dataSource" matSort #prodSort="matSort" class="mat-elevation-z8">
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Name</th>
+      <td mat-cell *matCellDef="let r">{{ r.name }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="createdDate">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Created</th>
+      <td mat-cell *matCellDef="let r">{{ r.createdDate | date:'yyyy-MM-dd' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Status</th>
+      <td mat-cell *matCellDef="let r">{{ r.status }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="first_Home_Use_Date__c">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">First Use</th>
+      <td mat-cell *matCellDef="let r">{{ r.first_Home_Use_Date__c | date:'yyyy-MM-dd' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="four_Year_End_of_Useful_Life_Date__c">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">4-Year EOL</th>
+      <td mat-cell *matCellDef="let r">{{ r.four_Year_End_of_Useful_Life_Date__c | date:'yyyy-MM-dd' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="five_Year_End_of_Useful_Life_Date__c">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">5-Year EOL</th>
+      <td mat-cell *matCellDef="let r">{{ r.five_Year_End_of_Useful_Life_Date__c | date:'yyyy-MM-dd' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="product_Code__c">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Code</th>
+      <td mat-cell *matCellDef="let r">{{ r.product_Code__c }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="serial_Number__c">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Serial</th>
+      <td mat-cell *matCellDef="let r">{{ r.serial_Number__c }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let r; columns: displayedColumns"></tr>
+  </table>
+
+  <mat-paginator #prodPaginator [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions" showFirstLastButtons>
+  </mat-paginator>
+</div>
+
+<div class="spinner-overlay" *ngIf="isLoading">
+  <mat-spinner diameter="60"></mat-spinner>
+</div>

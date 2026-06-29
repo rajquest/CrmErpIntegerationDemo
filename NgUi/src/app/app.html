@@ -1,0 +1,49 @@
+<div class="layout">
+  <header class="header">
+    <div class="header-left">
+      <span class="company-name">Edwards Lifesciences - Infor Api Integration Demo</span>
+    </div>
+    <div class="header-right">
+      <a href="#" (click)="clearSession()">Sign out</a>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <ul class="menu">
+      <li><a routerLink="/getToken" routerLinkActive="active">API Tokens</a></li>
+    </ul>
+
+    <div class="saved-reports">
+      <h4>SYTELINE INFOR ERP</h4>
+      <ul>
+        <li><a routerLink="/dashboard" routerLinkActive="active">Schema</a></li>
+        <li><a routerLink="/items" routerLinkActive="active">Items</a></li>
+        <li><a routerLink="/taxCodes" routerLinkActive="active">Tax Code</a></li>
+        <li><a routerLink="/inventoryLots" routerLinkActive="active">Inventory Lot</a></li>
+        <li><a routerLink="/orders" routerLinkActive="active">Orders</a></li>
+        <li><a routerLink="/itemLocations" routerLinkActive="active">Item Lots Serial Nbrs</a></li>
+        <li><a routerLink="/materialTransactions" routerLinkActive="active">Product Distribution</a></li>
+      </ul>
+    </div>
+
+    <div class="saved-reports">
+      <h4>SALESFORCE</h4>
+      <ul>
+        <li><a routerLink="/sfTables" routerLinkActive="active">SObjects</a></li>
+        <li><a routerLink="/sfDevices" routerLinkActive="active">Devices</a></li>
+      </ul>
+    </div>
+
+    <div class="saved-reports">
+      <h4>ACCOUNTING</h4>
+      <ul>
+        <li><a routerLink="/jobVariance" routerLinkActive="active">Job Variance</a></li>
+        <li><a routerLink="/invoicedOrders" routerLinkActive="active">Invoiced Orders</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

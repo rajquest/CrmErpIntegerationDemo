@@ -1,0 +1,75 @@
+<div class="items-container">
+  <h2>Material Transactions</h2>
+
+  <div class="row">
+    <div class="col-3">
+      <mat-form-field>
+        <mat-label>Enter a date range</mat-label>
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate placeholder="Start date" [(ngModel)]="startDate">
+          <input matEndDate placeholder="End date" [(ngModel)]="endDate">
+        </mat-date-range-input>
+        <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+    </div>
+
+    <div class="col-3">
+      <mat-form-field appearance="outline" style="width:100%">
+        <mat-label>Transaction Type</mat-label>
+        <mat-select [(value)]="selectedTransactionType" (selectionChange)="onTransactionTypeChange($event.value)">
+          <mat-option value=""></mat-option>
+          <mat-option *ngFor="let type of transactionTypes" [value]="type">
+            {{ type }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="col-2">
+      <button mat-raised-button (click)="onSearch()" class="btn btn-secondary">
+        Search
+      </button>
+    </div>
+
+    <div class="col-2">
+      <button mat-raised-button class="btn btn-success" (click)="exportDataset()">
+        <mat-icon>table_view</mat-icon> Export
+      </button>
+    </div>
+
+    <div class="col-3 record-count">
+      Total Records: {{ dataSource.data.length || 0 }}
+    </div>
+  </div>
+
+  <div class="spinner-overlay" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 full-width">
+    <ng-container matColumnDef="monthYear" *ngIf="hasMonthGrouping">
+      <th mat-header-cell *matHeaderCellDef class="tb-header-cell">Month</th>
+      <td mat-cell *matCellDef="let row">{{ row.monthYear }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="item">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Item</th>
+      <td mat-cell *matCellDef="let row">{{ row.item }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="itemDescription">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Description</th>
+      <td mat-cell *matCellDef="let row">{{ row.itemDescription }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="totalQty">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="tb-header-cell">Total Qty</th>
+      <td mat-cell *matCellDef="let row">{{ row.totalQty }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</div>
