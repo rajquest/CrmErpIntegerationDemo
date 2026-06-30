@@ -1,5 +1,10 @@
 <div class="dashboard-container">
-  <h2 class="title">OAuth Token Generator</h2>
+  <div class="page-header">
+    <h2 class="title">OAuth Token Generator</h2>
+    <button (click)="clearTokens()" class="clearButton">
+      Clear All Tokens
+    </button>
+  </div>
 
   <div class="token-panel">
     <!-- Left Panel: Infor Tokens -->
@@ -10,10 +15,12 @@
         <button (click)="getInforAppToken()" class="redButton">
           Get Infor App OAuth Token
         </button>
-        <div class="result-section" *ngIf="accessToken || errorMessage">
-          <label>Infor App Access Token:</label>
-          <textarea rows="6" readonly [value]="accessToken || errorMessage"></textarea>
-        </div>
+        @if (inforTokenFetched()) {
+          <div class="result-section">
+            <label>Infor App Access Token:</label>
+            <textarea rows="6" readonly>{{ accessToken() || errorMessage() }}</textarea>
+          </div>
+        }
       </div>
 
       <hr class="divider" />
@@ -22,10 +29,25 @@
         <button (click)="getInforApiToken()" class="redButton">
           Get Infor API Token
         </button>
-        <div class="result-section" *ngIf="apiAccessToken || appErrorMessage">
-          <label>API Access Token:</label>
-          <textarea rows="6" readonly [value]="apiAccessToken || appErrorMessage"></textarea>
-        </div>
+        @if (inforApiTokenFetched()) {
+          <div class="result-section">
+            <label>API Access Token:</label>
+            <textarea rows="6" readonly>{{ apiAccessToken() || appErrorMessage() }}</textarea>
+          </div>
+        }
+      </div>
+
+      <hr class="divider" />
+
+      <div class="form-section">
+        <label class="override-label">Infor API Token Override</label>
+        <textarea rows="4" [(ngModel)]="overrideTokenInput" placeholder="Paste token here..."></textarea>
+        <button (click)="saveOverrideToken()" class="redButton override-btn">
+          Save Override Token
+        </button>
+        @if (overrideSaved()) {
+          <div class="override-feedback">Saved to sessionStorage as <code>inforAPIOverideToken</code></div>
+        }
       </div>
     </div>
 
@@ -36,10 +58,12 @@
         <button (click)="getSalesforceToken()" class="blueButton">
           Get Salesforce API Token
         </button>
-        <div class="result-section" *ngIf="sfAccessToken || sfErrorMessage">
-          <label>Salesforce Access Token:</label>
-          <textarea rows="6" readonly [value]="sfAccessToken || sfErrorMessage"></textarea>
-        </div>
+        @if (sfTokenFetched()) {
+          <div class="result-section">
+            <label>Salesforce Access Token:</label>
+            <textarea rows="6" readonly>{{ sfAccessToken() || sfErrorMessage() }}</textarea>
+          </div>
+        }
       </div>
     </div>
   </div>

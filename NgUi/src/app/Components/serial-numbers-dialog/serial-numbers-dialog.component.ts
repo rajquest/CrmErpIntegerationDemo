@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
@@ -23,7 +23,8 @@ export class SerialNumbersDialogComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { selectedRow: ItemLotLocation },
     private dialogRef: MatDialogRef<SerialNumbersDialogComponent>,
-    private erpService: InforApiService
+    private erpService: InforApiService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -39,6 +40,7 @@ export class SerialNumbersDialogComponent implements OnInit {
     this.erpService.getSerialNumbers(0, filter).subscribe({
       next: result => {
         this.dataSource.data = result;
+        this.cdr.detectChanges();
       },
       error: err => {
         console.error('Failed to load serials', err);

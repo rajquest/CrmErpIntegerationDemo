@@ -9,10 +9,11 @@ import { environment } from '../../environments/environment';
 })
 export class TokenService extends BaseService {
 
-  private inforErpBaseUrl = `${environment.apiBaseUrl}/InforErp`;
+  private inforErpBaseUrl = `${environment.apiBaseUrl}/InforAuth`;
   private salesforceBaseUrl = `${environment.apiBaseUrl}/Salesforce`;
 
   getToken(): Observable<string> {
+    console.log("Infor Token Request");
     return this.http.get(`${this.inforErpBaseUrl}/GetToken`, {
       responseType: 'text'
     });
@@ -36,8 +37,9 @@ export class TokenService extends BaseService {
   checkInforTokensAndPrompt(): boolean {
     const storedToken = sessionStorage.getItem('infor_access_token');
     const apiStoredToken = sessionStorage.getItem('infor_api_access_token');
-    if (!storedToken || !apiStoredToken) {
-      console.warn('Missing one or both Infor tokens.');
+    const overrideToken = sessionStorage.getItem('inforAPIOverideToken');
+    if (!overrideToken && (!storedToken || !apiStoredToken)) {
+      console.warn('Missing Infor tokens. Generate or refresh new tokens, or set an override token.');
       return false;
     }
     return true;
@@ -53,6 +55,8 @@ export class TokenService extends BaseService {
   }
 
   getInforApiToken(): string {
+    const overrideToken = sessionStorage.getItem('inforAPIOverideToken');
+    if (overrideToken) return overrideToken;
     const token = sessionStorage.getItem('infor_api_access_token');
     if (!token) {
       throw new Error('Missing Infor API token.');
@@ -62,5 +66,9 @@ export class TokenService extends BaseService {
 
   setInforApiToken(token: string): void {
     sessionStorage.setItem('infor_api_access_token', token);
+  }
+
+  getInforApiOverrideToken(): string | null {
+    return sessionStorage.getItem('inforAPIOverideToken');
   }
 }

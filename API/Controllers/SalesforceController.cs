@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
+using API.Filters;
 using API.Interfaces;
 using API.Models.Salesforce;
 
@@ -10,10 +10,11 @@ namespace API.Controllers
     public class SalesforceController : ControllerBase
     {
         private readonly ILogger<SalesforceController> _logger;
-        private readonly ITokenService _tokenService;
+        private readonly ISalesforceTokenService _tokenService;
         private readonly ISalesforceService _salesforceService;
+
         public SalesforceController(ILogger<SalesforceController> logger,
-            ITokenService tokenService,
+            ISalesforceTokenService tokenService,
             ISalesforceService salesforceService)
         {
             _logger = logger;
@@ -24,48 +25,42 @@ namespace API.Controllers
         [HttpGet("GetToken")]
         public async Task<ActionResult<string>> GetOAuthToken()
         {
-            var token = await _tokenService.GetSalesforceOAuthTokenAsync();
+            var token = await _tokenService.GetOAuthTokenAsync();
             return Ok(token);
         }
 
         [HttpPost("GetAllsObjects")]
-        public async Task<ActionResult<string[]>> GetsObjects([FromBody] string token)
+        [RequiresBearerToken]
+        public async Task<ActionResult<string[]>> GetsObjects([FromBody] string bearerToken)
         {
-            if (string.IsNullOrEmpty(token))
-                return BadRequest("Missing token");
-            
-            var sObjects = await _salesforceService.GetAllSObjectsAsync(token);
+            var sObjects = await _salesforceService.GetAllSObjectsAsync(bearerToken);
             return Ok(sObjects);
         }
 
         [HttpPost("GetTableColumnNames/{sObjectName}")]
-        public async Task<ActionResult<List<SObjectFieldInfo>>> GetTableColumnNames(string sObjectName, 
-            [FromBody] string token)
+        [RequiresBearerToken]
+        public async Task<ActionResult<List<SObjectFieldInfo>>> GetTableColumnNames(string sObjectName,
+            [FromBody] string bearerToken)
         {
-            if (string.IsNullOrEmpty(token))
-                return BadRequest("Missing token");
-
-            var sObjects = await _salesforceService.GetTableColumnNames(token, sObjectName);
+            var sObjects = await _salesforceService.GetTableColumnNames(bearerToken, sObjectName);
             return Ok(sObjects);
         }
 
         [HttpPost("CareProgramEnrolleeProduct/{rowCount}")]
+        [RequiresBearerToken]
         public async Task<ActionResult<CareProgramEnrolleeProduct[]>> GetCareProgramEnrolleeProduct(int rowCount,
-            [FromBody] string token)
+            [FromBody] string bearerToken)
         {
-            if (string.IsNullOrEmpty(token))
-                return BadRequest("Missing token");
-            var sObjects = await _salesforceService.GetCareProgramEnrolleeProductRowsAsync(token, rowCount);
+            var sObjects = await _salesforceService.GetCareProgramEnrolleeProductRowsAsync(bearerToken, rowCount);
             return Ok(sObjects);
         }
 
         [HttpPost("Accounts/{rowCount}")]
+        [RequiresBearerToken]
         public async Task<ActionResult<Account[]>> GetAccounts(int rowCount,
-            [FromBody] string token)
+            [FromBody] string bearerToken)
         {
-            if (string.IsNullOrEmpty(token))
-                return BadRequest("Missing token");
-            var sObjects = await _salesforceService.GetAccountRowsAsync(token, rowCount);
+            var sObjects = await _salesforceService.GetAccountRowsAsync(bearerToken, rowCount);
             return Ok(sObjects);
         }
     }

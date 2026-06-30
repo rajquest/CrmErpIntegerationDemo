@@ -3,9 +3,16 @@
   font-family: Arial, sans-serif;
 }
 
-.title {
-  text-align: center;
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
   margin-bottom: 20px;
+}
+
+.title {
+  margin: 0;
 }
 
 .token-panel {
@@ -73,10 +80,43 @@ textarea {
   }
 }
 
+.clearButton {
+  background-color: transparent;
+  color: #555;
+  border: 1px solid #bbb;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.85rem;
+  transition: background-color 0.2s, color 0.2s;
+
+  &:hover {
+    background-color: #f0f0f0;
+    color: #222;
+  }
+}
+
 .divider {
   border: none;
   border-top: 1px solid #ddd;
   margin: 20px 0;
+}
+
+.override-label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.override-btn {
+  margin-top: 8px;
+}
+
+.override-feedback {
+  margin-top: 8px;
+  color: #2e7d32;
+  font-size: 0.85rem;
 }
 
 @media (max-width: 768px) {

@@ -3,7 +3,10 @@ using API.Common;
 using API.Interfaces;
 using API.Mapper;
 using API.Services;
+using API.Services.Auth;
+using API.Services.Infor;
 using API.Services.InforErp;
+using API.Services.Lookup;
 using DotNetEnv;
 
 // Load local.env before CreateBuilder so env vars are available to IConfiguration.
@@ -16,11 +19,13 @@ if (File.Exists(envFile))
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var disableSslValidation = builder.Configuration.GetValue<bool>("InforErp:DisableSslValidation");
 builder.Services.AddHttpClient("InforApi")
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
     {
-        ServerCertificateCustomValidationCallback =
-            HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        ServerCertificateCustomValidationCallback = disableSslValidation
+            ? HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            : null
     });
 
 builder.Services.AddControllers();
@@ -53,27 +58,36 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+var allowedOrigins = builder.Configuration["Cors:AllowedOrigins"]
+    ?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? [];
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
-        policy.AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod());
+    {
+        if (allowedOrigins.Length > 0)
+            policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
+        else
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    });
 });
 
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
 
 // Register configuration manager
 builder.Services.AddSingleton<IAppSettingsManager, AppSettingsManager>();
-builder.Services.AddSingleton<ITokenService, TokenService>();
+builder.Services.AddSingleton<IInforTokenService, InforTokenService>();
+builder.Services.AddSingleton<ISalesforceTokenService, SalesforceTokenService>();
 builder.Services.AddScoped<IItemLotLocationService, ItemLotLocationService>();
 builder.Services.AddScoped<IItemsSearchService, ItemsSearchService>();
 builder.Services.AddScoped<ITaxLookupService, TaxLookupService>();
 builder.Services.AddScoped<ISalesforceService, SalesforceService>();
 builder.Services.AddScoped<IInforErpService, InforErpService>();
-builder.Services.AddScoped<ICustomerOrderService, CustomerOrderService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IInvoiceEnrichmentService, InvoiceEnrichmentService>();
 builder.Services.AddScoped<IJobVarianceService, JobVarianceService>();
-builder.Services.AddScoped<ILookupService, LookupService>();
+builder.Services.AddScoped<IDropdownService, DropdownService>();
 
 var app = builder.Build();
 

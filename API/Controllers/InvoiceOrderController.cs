@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using API.Common;
+using API.Filters;
 using API.Interfaces;
 using API.Models.InforErp;
 
@@ -7,49 +8,32 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class InvoiceOrderController: Controller
+    public class InvoiceOrderController : Controller
     {
-        private readonly ICustomerOrderService _customerOrderService;
+        private readonly IInvoiceEnrichmentService _invoiceEnrichmentService;
+        private readonly IOrderService _orderService;
 
-        public InvoiceOrderController(ICustomerOrderService customerOrderService)
+        public InvoiceOrderController(IInvoiceEnrichmentService invoiceEnrichmentService, IOrderService orderService)
         {
-            _customerOrderService = customerOrderService;
+            _invoiceEnrichmentService = invoiceEnrichmentService;
+            _orderService = orderService;
         }
 
         [HttpPost("InvoicedOrders")]
-        public async Task<ActionResult<InvoicedOrder[]>> InvoicedOrders([FromQuery] string filter, 
+        [RequiresBearerToken]
+        public async Task<ActionResult<InvoicedOrder[]>> InvoicedOrders([FromQuery] string filter,
             [FromBody] string bearerToken)
         {
-            if (string.IsNullOrWhiteSpace(bearerToken))
-            {
-                return BadRequest(new
-                {
-                    Success = false,
-                    Message = "Missing Bearer token. Please authenticate first."
-                });
-            }
-
-            var items = await _customerOrderService
-                .GetInvoicedOrders(filter, bearerToken);
-
+            var items = await _invoiceEnrichmentService.GetInvoicedOrders(filter, bearerToken);
             return Ok(items);
         }
 
         [HttpPost("material-transactions")]
+        [RequiresBearerToken]
         public async Task<ActionResult<MaterialTransactionSummary[]>> GetMaterialTransactions([FromQuery] string filter,
             [FromBody] string bearerToken)
         {
-            if (string.IsNullOrWhiteSpace(bearerToken))
-            {
-                return BadRequest(new
-                {
-                    Success = false,
-                    Message = "Missing Bearer token. Please authenticate first."
-                });
-            }
-
-            var transactions = await _customerOrderService
-                .GetMaterialTransaction(filter, bearerToken);
+            var transactions = await _orderService.GetMaterialTransaction(filter, bearerToken);
 
             bool spansMultipleMonths = transactions
                 .Where(t => t.TransactionDate.HasValue)

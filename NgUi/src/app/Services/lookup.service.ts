@@ -1,7 +1,7 @@
 import { BaseService } from './base.service';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, defer, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { TokenService } from './token.service';
 import { ItemList } from '../Models/item-list';
@@ -20,34 +20,33 @@ export class LookupService extends BaseService {
   }
 
   getSLItemsList(): Observable<ItemList[]> {
-    const url = `${this.baseApiUrl}/Lookup/GetItems`;
+    const url = `${this.baseApiUrl}/Dropdown/GetItems`;
     return this.postWithToken<ItemList[]>(url);
   }
 
   getWarehouses(): Observable<Warehouse[]> {
-    const url = `${this.baseApiUrl}/Lookup/GetWarehouses`;
+    const url = `${this.baseApiUrl}/Dropdown/GetWarehouses`;
     return this.postWithToken<Warehouse[]>(url);
   }
 
   getLocations(): Observable<Location[]> {
-    const url = `${this.baseApiUrl}/Lookup/GetLocations`;
+    const url = `${this.baseApiUrl}/Dropdown/GetLocations`;
     return this.postWithToken<Location[]>(url);
   }
 
   getOrderNumbers(): Observable<OrderNumber[]> {
-    const url = `${this.baseApiUrl}/Lookup/GetOrderNumbers`;
+    const url = `${this.baseApiUrl}/Dropdown/GetOrderNumbers`;
     return this.postWithToken<OrderNumber[]>(url);
   }
 
   private postWithToken<T>(url: string): Observable<T> {
-    const token = this.tokenService.getInforApiToken();
-
-    const headers = new HttpHeaders({
-      'Accept': 'text/plain',
-      'Content-Type': 'application/json'
-    });
-
-    return this.post<T>(url, JSON.stringify(token), headers)
-      .pipe(map(res => res ?? ([] as unknown as T)));
+    return defer(() => {
+      const token = this.tokenService.getInforApiToken();
+      const headers = new HttpHeaders({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      });
+      return this.post<T>(url, JSON.stringify(token), headers);
+    }).pipe(map(res => res ?? ([] as unknown as T)));
   }
 }

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule, MatSelectChange } from '@angular/material/select';
@@ -72,7 +72,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   constructor(
     private inforApi: InforApiService,
     private dialogService: DialogService,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -127,8 +128,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.errorMessage = '';
     this.inforApi.getConfigurations().subscribe({
       next: (configs) => {
+        console.log(configs);
         this.configurations = configs;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.isLoading = false;

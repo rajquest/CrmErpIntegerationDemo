@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, defer, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ConfigurationResponse } from '../Models/configuration-response';
 import { CustomerOrder } from '../Models/customer-order';
@@ -29,24 +29,26 @@ export class InforApiService extends BaseService {
   }
 
   getConfigurations(): Observable<string[]> {
-    const url = `${this.baseApiUrl}/InforErp/GetConfigurations`;
-    const headers = new HttpHeaders({ 'Accept': 'text/plain' });
-    return this.http.get<string[]>(url, { headers })
-      .pipe(map(res => res || []));
+    return defer(() => {
+      const token = this.tokenService.getInforApiToken();
+      const url = `${this.baseApiUrl}/InforExplorer/GetConfigurations?bearerToken=${encodeURIComponent(token)}`;
+      const headers = new HttpHeaders({ 'Accept': 'application/json' });
+      return this.http.post<string[]>(url, null, { headers });
+    }).pipe(map(res => res || []));
   }
 
   getTableAttributesList(tableName: string): Observable<string[]> {
-    const url = `${this.baseApiUrl}/InforErp/GetIdoTableSchema?tableName=${tableName}`;
+    const url = `${this.baseApiUrl}/InforExplorer/GetIdoTableSchema?tableName=${tableName}`;
     return this.postWithToken<string[]>(url);
   }
 
   getSLItems(rowCount: Number): Observable<Item[]> {
-    const url = `${this.baseApiUrl}/InforErp/GetSLItems?rowCount=${rowCount}`;
+    const url = `${this.baseApiUrl}/InforExplorer/GetSLItems?rowCount=${rowCount}`;
     return this.postWithToken<Item[]>(url);
   }
 
   getCustomerOrders(rowCount: number, filter?: string): Observable<CustomerOrder[]> {
-    let url = `${this.baseApiUrl}/InforErp/GetCustomerOrders?rowCount=${rowCount}`;
+    let url = `${this.baseApiUrl}/Customer/GetCustomerOrders?rowCount=${rowCount}`;
     if (filter) {
       url += `&filter=${encodeURIComponent(filter)}`;
     }
@@ -54,7 +56,7 @@ export class InforApiService extends BaseService {
   }
 
   getCustomers(rowCount: number, filter?: string): Observable<Customer[]> {
-    let url = `${this.baseApiUrl}/InforErp/GetCustomers?rowCount=${rowCount}`;
+    let url = `${this.baseApiUrl}/Customer/GetCustomers?rowCount=${rowCount}`;
     if (filter) {
       url += `&filter=${encodeURIComponent(filter)}`;
     }
@@ -62,7 +64,7 @@ export class InforApiService extends BaseService {
   }
 
   getInventoryLots(rowCount: number): Observable<InventoryLot[]> {
-    const url = `${this.baseApiUrl}/InforErp/GetInventoryLots?rowCount=${rowCount}`;
+    const url = `${this.baseApiUrl}/Inventory/GetInventoryLots?rowCount=${rowCount}`;
     return this.postWithToken<InventoryLot[]>(url);
   }
 
@@ -104,7 +106,7 @@ export class InforApiService extends BaseService {
   }
 
   getTaxCodes(rowCount: number): Observable<TaxCodeItem[]> {
-    const url = `${this.baseApiUrl}/InforErp/GetTaxCodes?rowCount=${rowCount}`;
+    const url = `${this.baseApiUrl}/Tax/GetTaxCodes?rowCount=${rowCount}`;
     return this.postWithToken<TaxCodeItem[]>(url);
   }
 
@@ -117,32 +119,29 @@ export class InforApiService extends BaseService {
   }
 
   getInvoiceOrders(filterCriteria?: string): Observable<InvoicedOrder[]> {
-    let rowCount = 0;
-    let url = `${this.baseApiUrl}/InvoiceOrder/InvoicedOrders?rowCount=${rowCount}`;
+    let url = `${this.baseApiUrl}/InvoiceOrder/InvoicedOrders`;
     if (filterCriteria) {
-      url += `&filter=${encodeURIComponent(filterCriteria)}`;
+      url += `?filter=${encodeURIComponent(filterCriteria)}`;
     }
     return this.postWithToken<InvoicedOrder[]>(url);
   }
 
   getMaterialTransactionSummary(filterCriteria?: string): Observable<MaterialTransactionSummary[]> {
-    let rowCount = 0;
-    let url = `${this.baseApiUrl}/InvoiceOrder/material-transactions?rowCount=${rowCount}`;
+    let url = `${this.baseApiUrl}/InvoiceOrder/material-transactions`;
     if (filterCriteria) {
-      url += `&filter=${encodeURIComponent(filterCriteria)}`;
+      url += `?filter=${encodeURIComponent(filterCriteria)}`;
     }
     return this.postWithToken<MaterialTransactionSummary[]>(url);
   }
 
   private postWithToken<T>(url: string): Observable<T> {
-    const token = this.tokenService.getInforApiToken();
-
-    const headers = new HttpHeaders({
-      'Accept': 'text/plain',
-      'Content-Type': 'application/json'
-    });
-
-    return this.post<T>(url, JSON.stringify(token), headers)
-      .pipe(map(res => res ?? ([] as unknown as T)));
+    return defer(() => {
+      const token = this.tokenService.getInforApiToken();
+      const headers = new HttpHeaders({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      });
+      return this.post<T>(url, JSON.stringify(token), headers);
+    }).pipe(map(res => res ?? ([] as unknown as T)));
   }
 }

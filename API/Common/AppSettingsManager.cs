@@ -9,7 +9,7 @@ namespace API.Common
         public SalesforceSettings Salesforce { get; private set; }
         public InforIonSettings InforErp { get; private set; }
 
-        public AppSettingsManager(IConfiguration configuration, IWebHostEnvironment env)
+        public AppSettingsManager(IConfiguration configuration)
         {
             Salesforce = configuration.GetSection("Salesforce").Get<SalesforceSettings>()
                          ?? throw new InvalidOperationException("Salesforce settings missing in appsettings.json");

@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, AfterViewInit, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
@@ -41,7 +41,10 @@ export class DeviceDataComponent implements OnInit, AfterViewInit {
   @ViewChild('prodPaginator') paginator!: MatPaginator;
   @ViewChild('prodSort') sort!: MatSort;
 
-  constructor(private salesforceService: SalesforceService) { }
+  constructor(
+    private salesforceService: SalesforceService,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     this.loadProducts(this.pageSize);
@@ -67,6 +70,7 @@ export class DeviceDataComponent implements OnInit, AfterViewInit {
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.isLoading = false;
